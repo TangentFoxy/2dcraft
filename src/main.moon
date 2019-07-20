@@ -33,6 +33,11 @@ love.draw = ->
     screenX += 1
   love.graphics.setColor 1, 0, 0, 1
   love.graphics.circle "line", w/2, h/2, 5
+  t = world\get player\tile!
+  love.graphics.setColor 0, 0, 0, 1
+  love.graphics.rectangle "fill", 0, 0, w, 16
+  love.graphics.setColor 1, 1, 1, 1
+  love.graphics.print t[5] or "", 1, 1
 
 love.keypressed = (key) ->
   love.event.quit! if key == "escape"
