@@ -1,6 +1,6 @@
 import random, noise from love.math
 
-biomes = love.image.newImageData "biomes3.png"
+biomes = love.image.newImageData "biomes4.png"
 
 class World
   new: =>
@@ -15,6 +15,16 @@ class World
 
       t = @temperature(x, y)
       t = math.sqrt(t * (1 - h)) -- correct temperature according to altitude
+
+      if h < 1/3
+        map[x][y] = { 0, 0, 1 }
+      else
+        -- x is precipitation (0 to 599)
+        -- y is temperature (0 to 599)
+        t = math.min 599, math.floor t * 600
+        p = math.min 599, math.floor p * 600
+        map[x][y] = { biomes\getPixel p, t }
+      if true return map[x][y]
 
       colors = {
         ocean: { 0, 0, 1, 1 }
@@ -38,7 +48,7 @@ class World
       for biome, color in pairs colors
         table.insert color, biome
 
-      biomes = {
+      biomes_old = {
         -- "frozen desert": { 1/3, 0.75, 0.76, 1, h: 0.5, p: 0.12, t: 0 }
         -- swamp: { 65/255, 104/255, 37/255, 1, h: 0.1, p: 1, t: 0.8 }
         -- -- savanna: { }
@@ -63,7 +73,7 @@ class World
         dt = t - b.t
         return dh^2 + dp^2 + dt^2
       choices = {}
-      for name, value in pairs biomes
+      for name, value in pairs biomes_old
         table.insert choices, { d2(h, p, t, value), name, value }
       table.sort choices, (A, B) -> return A[1] < B[1]
       copy = (t) ->
@@ -75,10 +85,10 @@ class World
         r = math.sqrt A[1]^2 + B[1]^2
         g = math.sqrt A[2]^2 + B[2]^2
         b = math.sqrt A[3]^2 + B[3]^2
-        a = math.sqrt (A[4] or 1)^2 + ((B[4] or 1)^2
+        a = math.sqrt (A[4] or 1)^2 + (B[4] or 1)^2
         return { r, g, b, a or 1 }
-      map[x][y] = merge choices[1][3], choices[2][3], choices[1][1] - choices[2][1]
-      map[x][y][5] = "#{choices[1][2]}: #{tostring(h)\sub 1, 4}, #{tostring(p)\sub 1, 4}, #{tostring(t)\sub 1, 4}"
+      -- map[x][y] = merge choices[1][3], choices[2][3], choices[1][1] - choices[2][1]
+      -- map[x][y][5] = "#{choices[1][2]}: #{tostring(h)\sub 1, 4}, #{tostring(p)\sub 1, 4}, #{tostring(t)\sub 1, 4}"
 
       -- t = math.min 9, math.floor t * 10
       -- p = math.min 9, math.floor p * 10

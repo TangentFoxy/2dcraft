@@ -3,6 +3,9 @@ import tileSize from require "constants"
 w, h = love.graphics.getDimensions!
 screen = { w: math.floor(w/tileSize), h: math.floor(h/tileSize)}
 
+debug = false
+map = true
+
 Player = require "Player"
 player = Player!
 
@@ -31,13 +34,28 @@ love.draw = ->
       screenY += 1
     screenY = 0
     screenX += 1
-  love.graphics.setColor 1, 0, 0, 1
-  love.graphics.circle "line", w/2, h/2, 5
-  t = world\get player\tile!
-  love.graphics.setColor 0, 0, 0, 1
-  love.graphics.rectangle "fill", 0, 0, w, 16
-  love.graphics.setColor 1, 1, 1, 1
-  love.graphics.print t[5] or "", 1, 1
+  if debug
+    love.graphics.setColor 1, 0, 0, 1
+    love.graphics.circle "line", w/2, h/2, 5
+    t = world\get player\tile!
+    love.graphics.setColor 0, 0, 0, 1
+    love.graphics.rectangle "fill", 0, 0, w, 16
+    love.graphics.setColor 1, 1, 1, 1
+    love.graphics.print t[5] or "", 1, 1
+  if map
+    mapResolution = 14
+    x, y = player\tile!
+    screenX, screenY = 0, 0
+    for x = x - 50 * mapResolution, x + 49 * mapResolution, mapResolution
+      for y = y - 50 * mapResolution, y + 49 * mapResolution, mapResolution
+        if tile = world\get x, y
+          love.graphics.setColor tile
+        else
+          love.graphics.setColor 0, 0, 0, 1
+        love.graphics.points screenX, screenY
+        screenY += 1
+      screenY = 0
+      screenX += 1
 
 love.keypressed = (key) ->
   love.event.quit! if key == "escape"
