@@ -1,0 +1,66 @@
+h < sealevel -->
+  ocean, swamp, tropical waters, deep ocean, frozen ocean
+  t++ --> tropical (shallow)
+  p++ --> swamp
+  h-- --> deep ocean
+  t-- --> frozen
+  else, ocean
+h ~~ sealevel -->
+  p-- --> sandy/rocky (varies based on wind?) altitude changes rocky/sandy
+  swamp, tropical, sandy beach, rocky beach (in some places), rest is ANYTHING
+h > ? -->
+  mountain, snow, evergreen forest, rocky desert (mountain tops?)
+  t-- -->
+    p+ snow (more about temperature than height!)
+    p- rocky/cold desert
+  p++ --> taiga
+  p~~ --> evergreen forest
+  p-- --> rocky desert
+  else, mountain
+else
+  ??
+
+p < ??
+  sandy desert, rocky desert, ice desert
+p > ??
+  tropical, coniferous, swamp
+
+t > ? < ?
+  savanna, shrubland, grassland, plains
+  t+ savanna
+  p+ grassland
+  p- plains
+
+shrubland, grassland, savanna, sandy desert, rocky desert, plains
+
+forest types: tropical (hot & rainy year-round), temperate, boreal (taiga)
+  dry, seasonal, evergreen, coniferous (in const temp, rainy, less than tropical)
+  taiga (mild rain season, long cold dry season)
+
+jungle vs rainforest vs tropical forest ???
+
+"hot desert": (t, h, p) -> (0.9 - p) + (t - 0.89) + 0.05
+"cold desert": (t, h, p) -> (0.9 - p) + (0.17 - t)
+-- tundra: (t, h, p) ->  (1 - t) + p -- (1 - t) / p
+grassland: (t, h, p) -> 1 - p --add low-medium temperature
+
+Temperature, height, precipitation.
+Height should affect temperature (colder at higher altitudes).
+Desert = almost no precipitation. Rocky, sandy, or ice.
+Savanna = ? Woodlands and grasslands, higher precipitation than grasslands alone.
+Rocky at higher altitudes. Sandy at altitudes near sea level?
+Water at lowest altitudes. Based on definable sea level. Also possibly based on a mildly cubicly interpoled value of height for smoother shorelines. Seas will be ice at freezing point (definable!) and tropical in hot water (definable).
+Snow at highest altitudes (altitude it starts at gets lower with lower temperature and with higher precipitation).
+Grassland at medium temperatures and low precipitation.
+Higher altitudes contain more exposed rock.
+
+(weathering generation?)
+Geological activity? At highest earthquakes and volcanoes.
+Seasonality (to effect biome selection)? Grassland would be more seasonal than savanna possibly?
+Desirability (for AI purposes)
+Additional custom defined values usable by mods: i.e. geothermal value combined partially with temperature to make more or less effective geothermal power, slope combined with water being present for more effective water power generation, aura field affecting magical powers, wind levels for wind power (combined w altitude!) and maybe even biome selection, sunlight (biome selection, can influence temperature, solar power generation).
+Will also need multiple coarse generators to use for object generation.
+
+high elevations get snow, rock, tundra; medium elevations get shrubs, deserts, forests, and grassland;
+low elevations get rain forests, grassland, and beaches
+marsh 'lakes' at low elevations, ice 'lakes' at high elevations
