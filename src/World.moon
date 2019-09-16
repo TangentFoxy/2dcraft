@@ -1,15 +1,54 @@
 import random, noise from love.math
 
-biomes = love.image.newImageData "biomes4.png"
+-- biomes = love.image.newImageData "biomes4.png"
+sands = love.image.newImageData "sands.png"
+
+colors = {
+  {0.92, {0.7, 0.7, 1, 1}}, -- ice (mountain)
+  {0.68, {0, 1/3, 0, 1}},   -- grass (other)
+  {0.65, {0.9, 0.8, 0, 1}}, -- shorelines (sand)
+  {0, {0, 0, 0.7, 1}}       -- water (ocean / lakes / wells)
+}
 
 class World
   new: =>
-    @generateSeed!
+    @map = {}
+    @lacunarity = 4
+    @persistance = 0.287
+    @octaves = 4
+    @scale = 0.00025 -- originally 0.00005 but that was too far out
+    @offset = love.math.random!
+
   get: (x, y) =>
     map = @map
     unless map[x]
       map[x] = {}
     unless map[x][y]
+      @generate x, y
+    return map[x][y]
+
+  generate: (x, y) =>
+    unless @map[x]
+      @map[x] = {}
+    unless @map[x][y]
+      value = 0
+      range = 0
+      for octave = 1, @octaves
+        frequency = @lacunarity^octave * @scale
+        amplitude = @persistance^octave
+        range += amplitude
+        value += amplitude * love.math.noise x * frequency + @offset, y * frequency + @offset
+      value /= range
+      for color in *colors
+        if color[1] < value
+          if color[1] == 0.65 -- sands
+            value = { sands\getPixel 511, math.min 511, math.floor (math.min 1, (value - 0.65) * (1/0.03) + 0.5) * 512 }
+          else
+            value = color[2]
+          break
+      @map[x][y] = value
+
+    if GARBAGE
       h = @altitude(x, y)
       p = @precipitation(x, y)
 
@@ -96,39 +135,3 @@ class World
 
       unless map[x][y]
         map[x][y] = colors.undefined
-
-    return map[x][y]
-  generateSeed: =>
-    @map = {}
-    @sealevel = random! * 0.06 + 0.05 -- 0.05 to 0.11
-    @precipitationXOffset = random! * 256
-    @precipitationYOffset = random! * 256
-    @precipitationScale = random! * 0.009 + 0.001
-    @temperatureXOffset = random! * 256
-    @temperatureYOffset = random! * 256
-    @temperatureScale = random! * 0.009 + 0.001
-    @altitudeXOffset = random! * 256
-    @altitudeYOffset = random! * 256
-    @altitudeScale = random! * 0.009 + 0.001
-    @altitudeAmplitude = random! * 0.9 + 0.1 -- max: 1, min: 0.1
-    @altitudeXOffset2 = random! * 256
-    @altitudeYOffset2 = random! * 256
-    @altitudeScale2 = random! * 0.012 + 0.008
-    @altitudeAmplitude2 = random! * 0.09 + 0.01 -- max: 0.1, min: 0.01
-    @altitudeXOffset3 = random! * 256
-    @altitudeYOffset3 = random! * 256
-    @altitudeScale3 = random! * 0.092 + 0.01
-    @altitudeAmplitude3 = random! * 0.009 + 0.001 -- max: 0.01, min: 0.001
-  precipitation: (x, y) =>
-    return noise((x + @precipitationXOffset) * @precipitationScale, (y + @precipitationYOffset) * @precipitationScale)
-  temperature: (x, y) =>
-    return noise((x + @temperatureXOffset) * @temperatureScale, (y + @temperatureYOffset) * @temperatureScale)
-  altitude: (x, y) =>
-    h = noise((x + @altitudeXOffset) * @altitudeScale, (y + @altitudeYOffset) * @altitudeScale) * @altitudeAmplitude +
-      noise((x + @altitudeXOffset2) * @altitudeScale2, (y + @altitudeYOffset2) * @altitudeScale2) * @altitudeAmplitude2 +
-      noise((x + @altitudeXOffset3) * @altitudeScale3, (y + @altitudeYOffset3) * @altitudeScale3) * @altitudeAmplitude3
-    -- max: 1.11, min: 0.111
-    -- slope = (output_end - output_start) / (input_end - input_start)
-    -- output = output_start + slope * (input - input_start)
-    slope = 1 / (1.11 - 0.111)
-    return slope * (h - 0.111)

@@ -66,4 +66,4 @@ love.keypressed = (key) ->
     player.speed /= 5
 
   if key == "r"
-    world\generateSeed!
+    world = World!
