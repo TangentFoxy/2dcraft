@@ -1,3 +1,3 @@
 return {
-  tileSize: 20
+  tileSize: 5
 }

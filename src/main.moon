@@ -3,7 +3,7 @@ import tileSize from require "constants"
 w, h = love.graphics.getDimensions!
 screen = { w: math.floor(w/tileSize), h: math.floor(h/tileSize)}
 
-debug = false
+debug = true
 map = true
 
 Player = require "Player"

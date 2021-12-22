@@ -2,6 +2,7 @@ import random, noise from love.math
 
 -- biomes = love.image.newImageData "biomes4.png"
 sands = love.image.newImageData "sands.png"
+grass = love.image.newImageData "biomes4.png"
 
 colors = {
   {0.92, {0.7, 0.7, 1, 1}}, -- ice (mountain)
@@ -43,6 +44,8 @@ class World
         if color[1] < value
           if color[1] == 0.65 -- sands
             value = { sands\getPixel 511, math.min 511, math.floor (math.min 1, (value - 0.65) * (1/0.03) + 0.5) * 512 }
+          elseif color[1] == 0.68
+            value = { grass\getPixel 599, math.min 599, math.floor (math.min 1, (value - 0.68) * (1/0.03) + 0.5) * 600 }
           else
             value = color[2]
           break
